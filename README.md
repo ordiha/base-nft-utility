@@ -10,3 +10,6 @@ link: https://basescan.org/address/0x475df0a82b4a0066a952ea908ccbfaa0ece60646#wr
 
 Escrow contract: 0xAA168dCC429308B51F0511eca6fB448765a101AC
 https://basescan.org/address/0xaa168dcc429308b51f0511eca6fb448765a101ac#code
+
+SubscriptionService: 0x0200C05230F678B9ddCA7Ece63ef9aA7F49Dd3F2
+https://basescan.org/address/0x0200c05230f678b9ddca7ece63ef9aa7f49dd3f2#code
