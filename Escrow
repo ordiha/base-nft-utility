@@ -1,0 +1,47 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract SimpleEscrow {
+    address public buyer;
+    address public seller;
+    address public arbiter;
+    uint256 public amount;
+
+    enum State { AWAITING_PAYMENT, FUNDED, RELEASED, REFUNDED }
+    State public state;
+
+    modifier onlyBuyer() {
+        require(msg.sender == buyer, "not buyer");
+        _;
+    }
+    modifier onlyArbiter() {
+        require(msg.sender == arbiter, "not arbiter");
+        _;
+    }
+
+    constructor(address _seller, address _arbiter) {
+        buyer = msg.sender;
+        seller = _seller;
+        arbiter = _arbiter;
+        state = State.AWAITING_PAYMENT;
+    }
+
+    function fund() external payable onlyBuyer {
+        require(state == State.AWAITING_PAYMENT, "already funded");
+        require(msg.value > 0, "zero funds");
+        amount = msg.value;
+        state = State.FUNDED;
+    }
+
+    function release() external onlyArbiter {
+        require(state == State.FUNDED, "not funded");
+        state = State.RELEASED;
+        payable(seller).transfer(amount);
+    }
+
+    function refund() external onlyArbiter {
+        require(state == State.FUNDED, "not funded");
+        state = State.REFUNDED;
+        payable(buyer).transfer(amount);
+    }
+}
