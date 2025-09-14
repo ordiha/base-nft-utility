@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contracts Hub — Builder Repo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg1: #0f172a;
+      --card-bg: rgba(255,255,255,0.04);
+      --glass: rgba(255,255,255,0.06);
+      --accent1: linear-gradient(135deg,#7b3fe4 0%, #ff6b6b 100%);
+      --accent2: linear-gradient(135deg,#06b6d4 0%, #7c3aed 100%);
+      --accent3: linear-gradient(135deg,#f59e0b 0%, #ef4444 100%);
+      color-scheme: dark;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background: radial-gradient(1200px 400px at 10% 10%, rgba(124,58,237,0.12), transparent), radial-gradient(1000px 360px at 90% 90%, rgba(99,102,241,0.08), transparent), var(--bg1);
+      color:#e6eef8;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:48px;
+    }
+    header{display:flex;align-items:center;gap:18px;margin-bottom:28px}
+    .logo{
+      width:64px;height:64px;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:800;color:white;font-size:20px;box-shadow:0 8px 30px rgba(12,12,30,0.6);
+    }
+    h1{font-size:22px;margin:0}
+    p.lead{margin:4px 0 0;color:#a9c0dd}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:22px}
+    .card{background:var(--card-bg);border-radius:14px;padding:18px;backdrop-filter: blur(6px);box-shadow: 0 6px 18px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
+    .card h3{margin:0 0 8px;font-size:16px}
+    .chip{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;margin-right:8px;background:linear-gradient(90deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02));color:#dbeafe}
+    .desc{color:#9fb6d8;font-size:13px;margin-bottom:12px}
+    .actions{display:flex;gap:8px;align-items:center}
+    .btn{appearance:none;border:0;padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:600}
+    .btn-outline{background:transparent;border:1px solid rgba(255,255,255,0.06);color:inherit}
+    .btn-primary{background:var(--accent2);color:white;background-size:200% 200%;box-shadow:0 8px 20px rgba(7,22,50,0.45)}
+    .small{font-size:13px;padding:8px 10px}
+
+    pre{background:var(--glass);padding:10px;border-radius:8px;margin:12px 0;font-size:12px;overflow:auto;color:#e6eef8}
+    .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+    footer{margin-top:28px;color:#94adc8;font-size:13px}
+
+    .toggle{background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:10px;border-radius:8px;margin-top:10px}
+
+    .copy{display:inline-flex;gap:8px;align-items:center}
+
+    @media (max-width:600px){body{padding:18px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">B</div>
+    <div>
+      <h1>Builder Repo — Contracts Hub</h1>
+      <p class="lead">A colorful front to showcase & copy deploy inputs for your 6 contracts. Drop this as <code>index.html</code> in the repo root.</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="grid">
+      <!-- GiveawayNFT -->
+      <div class="card">
+        <h3>GiveawayNFT <span class="chip">ERC-721</span></h3>
+        <div class="desc">Owner-only batch minting NFT. Minimal, single-file.</div>
+        <div class="meta">
+          <div>Compiler: <strong>0.8.20</strong></div>
+          <div>Optimization: <strong>enabled, 200</strong></div>
+        </div>
+
+        <div class="toggle" id="t1">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-weight:600">Constructor inputs</div>
+            <div class="copy">
+              <button class="btn btn-outline small" onclick="copyText('giveaway')">Copy</button>
+            </div>
+          </div>
+          <pre id="giveaway">"MyGiveawayNFT","GIVE","https://example.com/metadata/"</pre>
+        </div>
+      </div>
+
+      <!-- DonationTracker -->
+      <div class="card">
+        <h3>DonationTracker <span class="chip">Payments</span></h3>
+        <div class="desc">Simple donation contract: anyone can send ETH and owner withdraws.</div>
+        <div class="meta"><div>No constructor params</div></div>
+        <div class="toggle">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-weight:600">Deploy</div>
+            <button class="btn btn-primary small" onclick="copyText('none')">Copy placeholder</button>
+          </div>
+          <pre id="none">(leave empty)</pre>
+        </div>
+      </div>
+
+      <!-- VotingSystem -->
+      <div class="card">
+        <h3>VotingSystem <span class="chip">Governance</span></h3>
+        <div class="desc">On-chain proposals + single-vote per address.</div>
+        <div class="toggle">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-weight:600">Constructor inputs</div>
+            <button class="btn btn-outline small" onclick="copyText('voting')">Copy</button>
+          </div>
+          <pre id="voting">["Proposal 1","Proposal 2","Proposal 3"]</pre>
+        </div>
+      </div>
+
+      <!-- SimpleEscrow -->
+      <div class="card">
+        <h3>SimpleEscrow <span class="chip">Escrow</span></h3>
+        <div class="desc">Buyer funds, arbiter releases or refunds seller/buyer.</div>
+        <div class="toggle">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-weight:600">Constructor inputs</div>
+            <button class="btn btn-outline small" onclick="copyText('escrow')">Copy</button>
+          </div>
+          <pre id="escrow">"0xSellerAddressHere","0xArbiterAddressHere"</pre>
+        </div>
+      </div>
+
+      <!-- SubscriptionService -->
+      <div class="card">
+        <h3>SubscriptionService <span class="chip">SaaS</span></h3>
+        <div class="desc">Recurring monthly subscription payments (in wei).</div>
+        <div class="toggle">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-weight:600">Constructor inputs</div>
+            <div>
+              <button class="btn btn-outline small" onclick="copyText('fee1')">Copy 1 ETH</button>
+              <button class="btn btn-outline small" onclick="copyText('fee2')">Copy 0.0000000001 ETH</button>
+            </div>
+          </div>
+          <pre id="fee1">1000000000000000000</pre>
+          <pre id="fee2">100000000</pre>
+        </div>
+      </div>
+
+      <!-- TokenVesting -->
+      <div class="card">
+        <h3>TokenVesting <span class="chip">Vesting</span></h3>
+        <div class="desc">Linear token vesting for an ERC20 beneficiary.</div>
+        <div class="toggle">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-weight:600">Constructor inputs (example)</div>
+            <button class="btn btn-primary small" onclick="copyText('vesting')">Copy all</button>
+          </div>
+          <pre id="vesting">"0xYourTokenAddress","0xYourWalletAddress",100000000,1736900000,86400</pre>
+          <div style="margin-top:8px;color:#9fb6d8;font-size:13px">(amount = 100000000 → 0.0000000001 token if token has 18 decimals; start = unix timestamp; duration = seconds)</div>
+        </div>
+      </div>
+
+    </section>
+
+    <footer>
+      Tip: open this file in your browser, click a card's <strong>Copy</strong> to paste constructor inputs into Remix's deploy box. Want a GitHub README version too?
+    </footer>
+  </main>
+
+  <script>
+    function copyText(id){
+      const el = document.getElementById(id);
+      if(!el) return;
+      navigator.clipboard.writeText(el.innerText.trim()).then(()=>{
+        const old = el.style.background;
+        el.style.border = '1px solid rgba(255,255,255,0.08)';
+        el.style.boxShadow = 'inset 0 0 0 9999px rgba(255,255,255,0.02)';
+        setTimeout(()=>{el.style.boxShadow='';},800);
+      }).catch(()=>alert('Copy failed — select text manually'));
+    }
+  </script>
+</body>
+</html>
