@@ -1,0 +1,38 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract Crowdfunding {
+    address public creator;
+    uint256 public goal;
+    uint256 public deadline;
+    uint256 public raised;
+
+    mapping(address => uint256) public contributions;
+
+    constructor(uint256 _goal, uint256 _duration) {
+        creator = msg.sender;
+        goal = _goal; // e.g., 0.0001 ETH
+        deadline = block.timestamp + _duration;
+    }
+
+    function contribute() external payable {
+        require(block.timestamp < deadline, "Ended");
+        require(msg.value >= 1 wei, "Too small"); // allow very small ETH
+        contributions[msg.sender] += msg.value;
+        raised += msg.value;
+    }
+
+    function withdraw() external {
+        require(msg.sender == creator, "Not creator");
+        require(raised >= goal, "Goal not met");
+        payable(creator).transfer(address(this).balance);
+    }
+
+    function refund() external {
+        require(block.timestamp >= deadline, "Still active");
+        require(raised < goal, "Goal met");
+        uint256 amount = contributions[msg.sender];
+        contributions[msg.sender] = 0;
+        payable(msg.sender).transfer(amount);
+    }
+}

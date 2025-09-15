@@ -14,3 +14,12 @@ https://basescan.org/address/0xaa168dcc429308b51f0511eca6fb448765a101ac#code
 
 SubscriptionService: 0x0200C05230F678B9ddCA7Ece63ef9aA7F49Dd3F2
 https://basescan.org/address/0x0200c05230f678b9ddca7ece63ef9aa7f49dd3f2#code
+
+Crowdfunding: 0xED7107FD71b5f41CE7d02B708Fa13bA7f1B7ce2F
+https://basescan.org/address/0xed7107fd71b5f41ce7d02b708fa13ba7f1b7ce2f#writeContract
+
+Lottery: 0x7804466d44EF4A65bb3526719dFbb006Ec12A19D
+https://basescan.org/address/0x7804466d44ef4a65bb3526719dfbb006ec12a19d#code
+
+MessageBoard: 0xAAc91bf539754Dc4A740e3B38Af99E0FC1E8e11B
+https://basescan.org/address/0xaac91bf539754dc4a740e3b38af99e0fc1e8e11b#code
