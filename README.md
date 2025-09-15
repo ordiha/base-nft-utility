@@ -20,3 +20,6 @@ https://basescan.org/address/0xed7107fd71b5f41ce7d02b708fa13ba7f1b7ce2f#writeCon
 
 Lottery: 0x7804466d44EF4A65bb3526719dFbb006Ec12A19D
 https://basescan.org/address/0x7804466d44ef4a65bb3526719dfbb006ec12a19d#code
+
+MessageBoard: 0xAAc91bf539754Dc4A740e3B38Af99E0FC1E8e11B
+https://basescan.org/address/0xaac91bf539754dc4a740e3b38af99e0fc1e8e11b#code
