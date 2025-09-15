@@ -8,7 +8,7 @@
   <style>
     :root{
       --bg1:#0f172a;
-      --card-bg:rgba(255,255,255,0.04);
+      --card-bg:rgba(255,255,255,0.05);
       --accent:linear-gradient(135deg,#7b3fe4,#06b6d4);
       color-scheme:dark;
     }
@@ -21,6 +21,7 @@
     .card{background:var(--card-bg);padding:18px;border-radius:14px;box-shadow:0 6px 16px rgba(0,0,0,0.4)}
     .card h3{margin:0 0 8px;font-size:17px}
     .desc{color:#9fb6d8;font-size:13px;margin-bottom:10px}
+    .guide{color:#ffd580;font-size:12px;margin:4px 0}
     .btn{cursor:pointer;padding:8px 12px;margin:4px 2px;border-radius:8px;font-size:13px;font-weight:600;border:none}
     .btn-primary{background:var(--accent);color:white}
     .btn-outline{background:transparent;border:1px solid rgba(255,255,255,0.2);color:#e6eef8}
@@ -32,7 +33,7 @@
   <div class="logo">B</div>
   <div>
     <h1>Builder Repo — Contracts Hub</h1>
-    <p class="lead">Interact with all 6 deployed contracts. Connect wallet & try actions.</p>
+    <p class="lead">Interact with all 9 deployed contracts. Connect wallet & follow ETH guides.</p>
   </div>
 </header>
 
@@ -49,8 +50,9 @@
   <div class="card">
     <h3>DonationTracker</h3>
     <div class="desc">Send ETH donations, track totals, owner can withdraw.</div>
+    <p class="guide">Guide: Send 0.0001 ETH</p>
     <button class="btn btn-primary" onclick="connectWallet()">Connect Wallet</button>
-    <button class="btn btn-outline" onclick="donate()">Donate 0.0001 ETH</button>
+    <button class="btn btn-outline" onclick="donate()">Donate</button>
   </div>
 
   <!-- VotingSystem -->
@@ -67,8 +69,9 @@
   <div class="card">
     <h3>SimpleEscrow</h3>
     <div class="desc">Buyer funds escrow, arbiter releases/refunds.</div>
+    <p class="guide">Guide: Fund with 0.01 ETH</p>
     <button class="btn btn-primary" onclick="connectWallet()">Connect Wallet</button>
-    <button class="btn btn-outline" onclick="fundEscrow()">Fund (0.01 ETH)</button>
+    <button class="btn btn-outline" onclick="fundEscrow()">Fund</button>
     <button class="btn btn-outline" onclick="releaseEscrow()">Release</button>
     <button class="btn btn-outline" onclick="refundEscrow()">Refund</button>
   </div>
@@ -76,9 +79,10 @@
   <!-- SubscriptionService -->
   <div class="card">
     <h3>SubscriptionService</h3>
-    <div class="desc">Subscribe for 1 month (very low cost).</div>
+    <div class="desc">Subscribe for 1 month (cheap).</div>
+    <p class="guide">Guide: Pay 0.0000000001 ETH (100,000,000 wei)</p>
     <button class="btn btn-primary" onclick="connectWallet()">Connect Wallet</button>
-    <button class="btn btn-outline" onclick="subscribe()">Subscribe (0.0000000001 ETH)</button>
+    <button class="btn btn-outline" onclick="subscribe()">Subscribe</button>
   </div>
 
   <!-- TokenVesting -->
@@ -88,9 +92,41 @@
     <button class="btn btn-primary" onclick="connectWallet()">Connect Wallet</button>
     <button class="btn btn-outline" onclick="releaseVested()">Release vested tokens</button>
   </div>
+
+  <!-- Crowdfunding -->
+  <div class="card">
+    <h3>Crowdfunding</h3>
+    <div class="desc">Contribute small ETH amounts to support campaign.</div>
+    <p class="guide">Guide: Contribute at least 0.00000001 ETH (10,000,000,000 wei)</p>
+    <button class="btn btn-primary" onclick="connectWallet()">Connect Wallet</button>
+    <button class="btn btn-outline" onclick="contribute()">Contribute</button>
+    <button class="btn btn-outline" onclick="refund()">Refund</button>
+  </div>
+
+  <!-- Lottery -->
+  <div class="card">
+    <h3>Lottery</h3>
+    <div class="desc">Buy cheap tickets, random winner gets balance.</div>
+    <p class="guide">Guide: Ticket price = 0.00000001 ETH (10,000,000,000 wei)</p>
+    <button class="btn btn-primary" onclick="connectWallet()">Connect Wallet</button>
+    <button class="btn btn-outline" onclick="buyTicket()">Buy Ticket</button>
+    <button class="btn btn-outline" onclick="pickWinner()">Pick Winner</button>
+  </div>
+
+  <!-- MessageBoard -->
+  <div class="card">
+    <h3>MessageBoard</h3>
+    <div class="desc">Post short messages on-chain.</div>
+    <button class="btn btn-primary" onclick="connectWallet()">Connect Wallet</button>
+    <input id="msgInput" placeholder="Your message" style="padding:6px;width:90%;margin:6px 0;border-radius:6px;border:none">
+    <button class="btn btn-outline" onclick="postMessage()">Post Message</button>
+  </div>
 </main>
 
-<footer>⚡ Paste your deployed contract addresses in the script below before running.</footer>
+<footer>
+  ⚡ Paste your deployed contract addresses in the script below.  
+  <br> ETH values are shown in guides (in both ETH and wei). Pay exact amount when required.
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
 <script>
@@ -103,14 +139,20 @@
   const escrowAddr   = "0xYourSimpleEscrow";
   const subsAddr     = "0xYourSubscriptionService";
   const vestingAddr  = "0xYourTokenVesting";
+  const crowdAddr    = "0xYourCrowdfunding";
+  const lotteryAddr  = "0xYourLottery";
+  const boardAddr    = "0xYourMessageBoard";
 
-  // === ABIs (minimal needed) ===
+  // === ABIs (minimal) ===
   const giveawayAbi = ["function giveawayMint(address[] calldata recipients) external"];
   const donationAbi = ["function donate() external payable"];
   const votingAbi   = ["function vote(uint256 proposalIndex) external"];
   const escrowAbi   = ["function fund() external payable","function release() external","function refund() external"];
   const subsAbi     = ["function subscribe(uint256 months) external payable"];
   const vestingAbi  = ["function release() external"];
+  const crowdAbi    = ["function contribute() external payable","function refund() external"];
+  const lotteryAbi  = ["function buyTicket() external payable","function pickWinner() external"];
+  const boardAbi    = ["function postMessage(string calldata _text) external"];
 
   // === connect wallet ===
   async function connectWallet(){
@@ -121,22 +163,28 @@
     alert("Wallet: " + await signer.getAddress());
   }
 
-  // === functions ===
+  // === GiveawayNFT ===
   async function giveawayMint(){
     const c = new ethers.Contract(giveawayAddr,giveawayAbi,signer);
     const tx = await c.giveawayMint([await signer.getAddress()]);
     await tx.wait(); alert("NFT minted!");
   }
+
+  // === DonationTracker ===
   async function donate(){
     const c = new ethers.Contract(donationAddr,donationAbi,signer);
     const tx = await c.donate({value: ethers.parseEther("0.0001")});
     await tx.wait(); alert("Donation sent!");
   }
+
+  // === VotingSystem ===
   async function vote(i){
     const c = new ethers.Contract(votingAddr,votingAbi,signer);
     const tx = await c.vote(i);
     await tx.wait(); alert("Voted for " + i);
   }
+
+  // === SimpleEscrow ===
   async function fundEscrow(){
     const c = new ethers.Contract(escrowAddr,escrowAbi,signer);
     const tx = await c.fund({value: ethers.parseEther("0.01")});
@@ -152,15 +200,52 @@
     const tx = await c.refund();
     await tx.wait(); alert("Escrow refunded!");
   }
+
+  // === SubscriptionService ===
   async function subscribe(){
     const c = new ethers.Contract(subsAddr,subsAbi,signer);
     const tx = await c.subscribe(1,{value:"100000000"}); // 0.0000000001 ETH
     await tx.wait(); alert("Subscribed!");
   }
+
+  // === TokenVesting ===
   async function releaseVested(){
     const c = new ethers.Contract(vestingAddr,vestingAbi,signer);
     const tx = await c.release();
     await tx.wait(); alert("Tokens released!");
+  }
+
+  // === Crowdfunding ===
+  async function contribute(){
+    const c = new ethers.Contract(crowdAddr,crowdAbi,signer);
+    const tx = await c.contribute({value:"10000000000"}); // 0.00000001 ETH
+    await tx.wait(); alert("Contribution sent!");
+  }
+  async function refund(){
+    const c = new ethers.Contract(crowdAddr,crowdAbi,signer);
+    const tx = await c.refund();
+    await tx.wait(); alert("Refund claimed!");
+  }
+
+  // === Lottery ===
+  async function buyTicket(){
+    const c = new ethers.Contract(lotteryAddr,lotteryAbi,signer);
+    const tx = await c.buyTicket({value:"10000000000"}); // 0.00000001 ETH
+    await tx.wait(); alert("Ticket bought!");
+  }
+  async function pickWinner(){
+    const c = new ethers.Contract(lotteryAddr,lotteryAbi,signer);
+    const tx = await c.pickWinner();
+    await tx.wait(); alert("Winner picked!");
+  }
+
+  // === MessageBoard ===
+  async function postMessage(){
+    const txt = document.getElementById("msgInput").value;
+    if(!txt) return alert("Enter a message");
+    const c = new ethers.Contract(boardAddr,boardAbi,signer);
+    const tx = await c.postMessage(txt);
+    await tx.wait(); alert("Message posted!");
   }
 </script>
 </body>
