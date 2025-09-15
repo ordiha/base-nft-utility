@@ -17,3 +17,6 @@ https://basescan.org/address/0x0200c05230f678b9ddca7ece63ef9aa7f49dd3f2#code
 
 Crowdfunding: 0xED7107FD71b5f41CE7d02B708Fa13bA7f1B7ce2F
 https://basescan.org/address/0xed7107fd71b5f41ce7d02b708fa13ba7f1b7ce2f#writeContract
+
+Lottery: 0x7804466d44EF4A65bb3526719dFbb006Ec12A19D
+https://basescan.org/address/0x7804466d44ef4a65bb3526719dfbb006ec12a19d#code
