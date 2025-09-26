@@ -1,76 +1,64 @@
-let web3;
+import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.esm.min.js";
+import WalletConnectProvider from "https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js";
+
 let provider;
-let selectedAccount;
+let signer;
 
-const projectId = "5056a2b581e5962f9e3083d68053b5d8"; // your WalletConnect project ID
-
+// Connect wallet function
 async function connectWallet() {
-  provider = new WalletConnectProvider.default({
-    rpc: {
-      8453: "https://mainnet.base.org" // Base Mainnet
-    },
-    projectId: projectId,
-    qrcode: true
-  });
-
-  await provider.enable();
-  web3 = new Web3(provider);
-
-  const accounts = await web3.eth.getAccounts();
-  selectedAccount = accounts[0];
-  document.getElementById("walletAddress").innerText = "Connected: " + selectedAccount;
-}
-
-document.getElementById("btnConnect").addEventListener("click", connectWallet);
-
-// Map contract name -> address + abi
-const contractMap = {
-  "GiveawayNFT": { address: "0x2DB841C867b2C6C757F33C93e8e268f23bEbbD62", abi: GiveawayNFT_ABI },
-  "DonationTracker": { address: "0x218232D36d27F9284550410380c758AaC2280001", abi: DonationTracker_ABI },
-  "VotingSystem": { address: "0x475dF0a82B4A0066a952EA908CcbFAa0ECE60646", abi: VotingSystem_ABI },
-  "Escrow": { address: "0xAA168dCC429308B51F0511eca6fB448765a101AC", abi: Escrow_ABI },
-  "SubscriptionService": { address: "0x0200C05230F678B9ddCA7Ece63ef9aA7F49Dd3F2", abi: SubscriptionService_ABI },
-  "Crowdfunding": { address: "0xED7107FD71b5f41CE7d02B708Fa13bA7f1B7ce2F", abi: Crowdfunding_ABI },
-  "Lottery": { address: "0x7804466d44EF4A65bb3526719dFbb006Ec12A19D", abi: Lottery_ABI },
-  "MessageBoard": { address: "0xAAc91bf539754Dc4A740e3B38Af99E0FC1E8e11B", abi: MessageBoard_ABI }
-};
-
-async function interactContract(name) {
-  const c = contractMap[name];
-  if (!c) {
-    alert("Contract not found");
-    return;
-  }
-
-  const contract = new web3.eth.Contract(c.abi, c.address);
-
-  let html = `<h3>${name} @ ${c.address}</h3>`;
-  html += `<p>Available functions:</p>`;
-
-  c.abi.filter(f => f.type === "function").forEach(fn => {
-    html += `<button onclick="callFunction('${name}', '${fn.name}')">${fn.name}</button><br>`;
-  });
-
-  document.getElementById("interaction").innerHTML = html;
-}
-
-async function callFunction(name, fnName) {
-  const c = contractMap[name];
-  const contract = new web3.eth.Contract(c.abi, c.address);
-
   try {
-    const fn = c.abi.find(f => f.name === fnName);
-    if (!fn) return alert("Function not found");
-
-    if (fn.stateMutability === "view" || fn.stateMutability === "pure") {
-      const result = await contract.methods[fnName]().call();
-      alert("Result: " + JSON.stringify(result));
+    if (window.ethereum) {
+      // Try browser extension wallet first (MetaMask, Rabby, etc.)
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      signer = provider.getSigner();
+      const address = await signer.getAddress();
+      alert("Connected with extension: " + address);
     } else {
-      const tx = await contract.methods[fnName]().send({ from: selectedAccount });
-      alert("TX Hash: " + tx.transactionHash);
+      // Fallback to WalletConnect (QR on desktop, deep link on mobile)
+      const wcProvider = new WalletConnectProvider({
+        rpc: {
+          8453: "https://mainnet.base.org" // Base mainnet
+        },
+        chainId: 8453,
+      });
+
+      await wcProvider.enable();
+      provider = new ethers.providers.Web3Provider(wcProvider);
+      signer = provider.getSigner();
+      const address = await signer.getAddress();
+      alert("Connected with WalletConnect: " + address);
     }
   } catch (err) {
-    console.error(err);
-    alert("Error: " + err.message);
+    console.error("Wallet connection failed:", err);
+    alert("Wallet connection failed: " + err.message);
   }
 }
+
+// Interact with contract function
+async function interactWithContract(contractAddress, abi, action, params = []) {
+  if (!signer) {
+    alert("Please connect a wallet first!");
+    return;
+  }
+  try {
+    const contract = new ethers.Contract(contractAddress, abi, signer);
+    const tx = await contract[action](...params);
+    alert(`Transaction sent! Hash: ${tx.hash}`);
+    await tx.wait();
+    alert("✅ Transaction confirmed!");
+  } catch (err) {
+    console.error("Contract interaction failed:", err);
+    alert("Contract interaction failed: " + err.message);
+  }
+}
+
+// Attach connect button
+document.addEventListener("DOMContentLoaded", () => {
+  const connectBtn = document.getElementById("btnConnect");
+  if (connectBtn) connectBtn.addEventListener("click", connectWallet);
+});
+
+// Expose to global
+window.connectWallet = connectWallet;
+window.interactWithContract = interactWithContract;
