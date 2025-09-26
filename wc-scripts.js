@@ -22,7 +22,10 @@ document.getElementById("btnConnect").addEventListener("click", async () => {
       await provider.request({ method: "eth_requestAccounts" });
     } else {
       const WalletConnectProvider = window.WalletConnectProvider.default;
-      provider = new WalletConnectProvider({ infuraId: "5056a2b581e5962f9e3083d68053b5d8" });
+      provider = new WalletConnectProvider({
+        infuraId: "5056a2b581e5962f9e3083d68053b5d8",
+        rpc: { 8453: "https://mainnet.base.org" }
+      });
       await provider.enable();
     }
 
@@ -34,24 +37,26 @@ document.getElementById("btnConnect").addEventListener("click", async () => {
     try {
       await provider.request({
         method: "wallet_switchEthereumChain",
-        params: [{ chainId: "0x2105" }],
+        params: [{ chainId: web3.utils.toHex(8453) }],
       });
     } catch (err) {
       if (err.code === 4902) {
         await provider.request({
           method: "wallet_addEthereumChain",
           params: [{
-            chainId: "0x2105",
+            chainId: web3.utils.toHex(8453),
             chainName: "Base Mainnet",
             rpcUrls: ["https://mainnet.base.org"],
             nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
             blockExplorerUrls: ["https://basescan.org"]
           }],
         });
+      } else {
+        throw err;
       }
     }
   } catch (err) {
-    console.error(err);
+    console.error("Wallet connection error:", err);
     document.getElementById("chain").innerText = "Failed to connect wallet";
   }
 });
@@ -74,17 +79,18 @@ for (const [name, { abi, address }] of Object.entries(CONTRACTS)) {
 
       actions[name][fnName] = async () => {
         try {
-          if (!accounts || !accounts[0]) {
-            throw new Error("Wallet not connected");
+          if (!web3 || !accounts || !accounts[0]) {
+            throw new Error("Wallet not connected. Please connect wallet first.");
           }
 
           const statusEl = document.getElementById(`${name}_${fnName}_status`);
-          statusEl.innerText = "Requesting wallet approval...";
+          statusEl.innerText = "Awaiting wallet approval...";
 
+          // Map inputs to match HTML input IDs
           const inputs = fn.inputs.map(input => {
-            const inputName = input.name || (fn.stateMutability === "payable" ? "value" : input.name);
-            const el = document.getElementById(`${name}_${fnName}_${inputName}`);
-            if (!el || !el.value) throw new Error(`Missing input for ${inputName}`);
+            const inputId = input.name ? `${name}_${fnName}_${input.name}` : `${name}_${fnName}_text`;
+            const el = document.getElementById(inputId);
+            if (!el || !el.value) throw new Error(`Missing input for ${input.name || "text"}`);
             return input.type === "uint256" ? parseInt(el.value) : el.value;
           });
 
@@ -92,17 +98,17 @@ for (const [name, { abi, address }] of Object.entries(CONTRACTS)) {
           if (fn.stateMutability === "payable") {
             const valueEl = document.getElementById(`${name}_${fnName}_value`);
             if (!valueEl || !valueEl.value || parseFloat(valueEl.value) <= 0) {
-              throw new Error("Invalid ETH amount");
+              throw new Error("Invalid or missing ETH amount");
             }
             options.value = web3.utils.toWei(valueEl.value, "ether");
           }
 
-          // Ensure WalletConnect transaction prompt
+          // Trigger transaction with WalletConnect
           const method = contract.methods[fnName](...inputs);
-          const gas = await method.estimateGas(options).then(g => Math.min(g * 1.5, 5000000));
+          const gas = await method.estimateGas(options).then(g => Math.floor(g * 1.5));
           const tx = await method.send({
             from: accounts[0],
-            gas,
+            gas: Math.min(gas, 5000000),
             gasPrice: await web3.eth.getGasPrice(),
             value: options.value || 0
           });
@@ -110,7 +116,7 @@ for (const [name, { abi, address }] of Object.entries(CONTRACTS)) {
           statusEl.innerText = `Success: ${tx.transactionHash}`;
           document.getElementById("txLog").innerText += `Tx [${name}.${fnName}]: ${tx.transactionHash}\n`;
         } catch (err) {
-          console.error(err);
+          console.error(`${name}.${fnName} error:`, err);
           const statusEl = document.getElementById(`${name}_${fnName}_status`);
           statusEl.innerText = `Error: ${err.message || "Transaction failed"}`;
         }
