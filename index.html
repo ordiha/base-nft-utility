@@ -1,33 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Base NFT Utility + WalletConnect</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Base NFT Utility — WalletConnect</title>
+  <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-  <script src="https://unpkg.com/@walletconnect/web3-provider/dist/umd/index.min.js"></script>
+  <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
 </head>
 <body>
-  <h1>Base NFT Utility dApp</h1>
+  <header class="top">
+    <h1>🎨 Base NFT Utility</h1>
+    <p class="lead">Connect with MetaMask, Rabby, or WalletConnect. Interact with all utility contracts.</p>
+    <div class="connect-row">
+      <button id="btnConnect" class="btn">🔗 Connect Wallet</button>
+      <div id="addr" class="addr">Not connected</div>
+      <div id="chain" class="chain"></div>
+    </div>
+  </header>
 
-  <button id="btnConnect">🔗 Connect Wallet</button>
-  <p id="walletAddress">Not connected</p>
+  <main class="grid" id="cards">
+    <!-- Example for GiveawayNFT -->
+    <section class="card">
+      <h2>🎁 GiveawayNFT</h2>
+      <div class="small">Call: <code>mint()</code></div>
+      <button onclick="actions.mintGiveaway()">Mint</button>
+      <div class="status" id="statusGiveaway"></div>
+      <a class="link" href="https://basescan.org/address/0x2DB841C867b2C6C757F33C93e8e268f23bEbbD62#writeContract" target="_blank">View on BaseScan</a>
+    </section>
 
-  <h2>Contracts</h2>
-  <div id="contracts">
-    <button onclick="interactContract('GiveawayNFT')">🎁 GiveawayNFT</button>
-    <button onclick="interactContract('DonationTracker')">💰 DonationTracker</button>
-    <button onclick="interactContract('VotingSystem')">🗳️ VotingSystem</button>
-    <button onclick="interactContract('Escrow')">🤝 Escrow</button>
-    <button onclick="interactContract('SubscriptionService')">📅 SubscriptionService</button>
-    <button onclick="interactContract('Crowdfunding')">🌍 Crowdfunding</button>
-    <button onclick="interactContract('Lottery')">🎟️ Lottery</button>
-    <button onclick="interactContract('MessageBoard')">💬 MessageBoard</button>
-  </div>
+    <!-- Example for DonationTracker -->
+    <section class="card">
+      <h2>❤️ DonationTracker</h2>
+      <div class="small">Call: <code>donate() payable</code></div>
+      <input id="donateEth" type="number" placeholder="ETH amount" step="0.00000001" />
+      <button onclick="actions.donate()">Donate</button>
+      <div class="status" id="statusDonate"></div>
+      <a class="link" href="https://basescan.org/address/0x218232D36d27F9284550410380c758AaC2280001#code" target="_blank">View on BaseScan</a>
+    </section>
 
-  <div id="interaction"></div>
+    <!-- Example for VotingSystem -->
+    <section class="card">
+      <h2>🗳 VotingSystem</h2>
+      <div class="small">Call: <code>vote(uint256)</code></div>
+      <input id="voteId" type="number" placeholder="Vote ID" />
+      <button onclick="actions.vote()">Vote</button>
+      <div class="status" id="statusVote"></div>
+      <a class="link" href="https://basescan.org/address/0x475dF0a82B4A0066a952EA908CcbFAa0ECE60646#writeContract" target="_blank">View on BaseScan</a>
+    </section>
 
-  <script src="abis.js"></script>
+    <!-- Example for Escrow -->
+    <section class="card">
+      <h2>💰 Escrow</h2>
+      <div class="small">Call: <code>deposit() payable</code></div>
+      <input id="escrowEth" type="number" placeholder="ETH amount" step="0.00000001" />
+      <button onclick="actions.depositEscrow()">Deposit</button>
+      <div class="status" id="statusEscrow"></div>
+      <a class="link" href="https://basescan.org/address/0xAA168dCC429308B51F0511eca6fB448765a101AC#code" target="_blank">View on BaseScan</a>
+    </section>
+
+    <!-- Example for SubscriptionService -->
+    <section class="card">
+      <h2>📅 SubscriptionService</h2>
+      <div class="small">Call: <code>subscribe() payable</code></div>
+      <input id="subEth" type="number" placeholder="ETH amount" step="0.00000001" />
+      <button onclick="actions.subscribe()">Subscribe</button>
+      <div class="status" id="statusSubscribe"></div>
+      <a class="link" href="https://basescan.org/address/0x0200C05230F678B9ddCA7Ece63ef9aA7F49Dd3F2#code" target="_blank">View on BaseScan</a>
+    </section>
+
+    <!-- Example for Crowdfunding -->
+    <section class="card">
+      <h2>💸 Crowdfunding</h2>
+      <div class="small">Call: <code>fund() payable</code></div>
+      <input id="fundEth" type="number" placeholder="ETH amount" step="0.00000001" />
+      <button onclick="actions.fund()">Fund</button>
+      <div class="status" id="statusFund"></div>
+      <a class="link" href="https://basescan.org/address/0xED7107FD71b5f41CE7d02B708Fa13bA7f1B7ce2F#writeContract" target="_blank">View on BaseScan</a>
+    </section>
+
+    <!-- Example for Lottery -->
+    <section class="card">
+      <h2>🎲 Lottery</h2>
+      <div class="small">Call: <code>buyTicket() payable</code></div>
+      <input id="lotteryEth" type="number" placeholder="ETH amount" step="0.00000001" />
+      <button onclick="actions.buyTicket()">Buy Ticket</button>
+      <div class="status" id="statusLottery"></div>
+      <a class="link" href="https://basescan.org/address/0x7804466d44EF4A65bb3526719dFbb006Ec12A19D#code" target="_blank">View on BaseScan</a>
+    </section>
+
+    <!-- Example for MessageBoard -->
+    <section class="card">
+      <h2>💬 MessageBoard</h2>
+      <div class="small">Call: <code>postMessage(string)</code></div>
+      <input id="messageText" placeholder="Write a message..." />
+      <button onclick="actions.postMessage()">Post</button>
+      <div class="status" id="statusMessage"></div>
+      <a class="link" href="https://basescan.org/address/0xAAc91bf539754Dc4A740e3B38Af99E0FC1E8e11B#code" target="_blank">View on BaseScan</a>
+    </section>
+
+  </main>
+
+  <footer class="foot">
+    <div>Repo: <code>base-nft-utility</code></div>
+    <div id="txLog" class="txlog"></div>
+  </footer>
+
   <script src="wc-scripts.js"></script>
 </body>
 </html>
