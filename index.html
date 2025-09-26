@@ -7,98 +7,87 @@
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+  <script src="abis.js"></script>
 </head>
 <body>
   <header class="top">
-    <h1>🎨 Base NFT Utility</h1>
-    <p class="lead">Connect with MetaMask, Rabby, or WalletConnect. Interact with all utility contracts.</p>
-    <div class="connect-row">
-      <button id="btnConnect" class="btn">🔗 Connect Wallet</button>
-      <div id="addr" class="addr">Not connected</div>
-      <div id="chain" class="chain"></div>
-    </div>
+    <h1>🌐 Base NFT Utility</h1>
+    <button id="btnConnect" class="btn">🔗 Connect Wallet</button>
+    <div id="addr" class="addr">Not connected</div>
+    <div id="chain" class="chain"></div>
   </header>
 
   <main class="grid" id="cards">
-    <!-- Example for GiveawayNFT -->
+    <!-- GiveawayNFT Example -->
     <section class="card">
-      <h2>🎁 GiveawayNFT</h2>
-      <div class="small">Call: <code>mint()</code></div>
-      <button onclick="actions.mintGiveaway()">Mint</button>
-      <div class="status" id="statusGiveaway"></div>
-      <a class="link" href="https://basescan.org/address/0x2DB841C867b2C6C757F33C93e8e268f23bEbbD62#writeContract" target="_blank">View on BaseScan</a>
+      <h2>🎁 Giveaway NFT</h2>
+      <div class="small">Call: <code>claimReward()</code></div>
+      <button onclick="actions.GiveawayNFT.claimReward()">Claim Reward</button>
+      <div class="status" id="GiveawayNFT_claimReward_status"></div>
     </section>
 
-    <!-- Example for DonationTracker -->
+    <!-- DonationTracker Example -->
     <section class="card">
-      <h2>❤️ DonationTracker</h2>
+      <h2>❤️ Donation Tracker</h2>
       <div class="small">Call: <code>donate() payable</code></div>
-      <input id="donateEth" type="number" placeholder="ETH amount" step="0.00000001" />
-      <button onclick="actions.donate()">Donate</button>
-      <div class="status" id="statusDonate"></div>
-      <a class="link" href="https://basescan.org/address/0x218232D36d27F9284550410380c758AaC2280001#code" target="_blank">View on BaseScan</a>
+      <input id="DonationTracker_donate_value" type="number" placeholder="ETH amount" step="0.00000001" />
+      <button onclick="actions.DonationTracker.donate()">Donate</button>
+      <div class="status" id="DonationTracker_donate_status"></div>
     </section>
 
-    <!-- Example for VotingSystem -->
+    <!-- VotingSystem Example -->
     <section class="card">
-      <h2>🗳 VotingSystem</h2>
+      <h2>🗳 Voting System</h2>
       <div class="small">Call: <code>vote(uint256)</code></div>
-      <input id="voteId" type="number" placeholder="Vote ID" />
-      <button onclick="actions.vote()">Vote</button>
-      <div class="status" id="statusVote"></div>
-      <a class="link" href="https://basescan.org/address/0x475dF0a82B4A0066a952EA908CcbFAa0ECE60646#writeContract" target="_blank">View on BaseScan</a>
+      <input id="VotingSystem_vote_choice" type="number" placeholder="Choice ID" />
+      <button onclick="actions.VotingSystem.vote()">Vote</button>
+      <div class="status" id="VotingSystem_vote_status"></div>
     </section>
 
-    <!-- Example for Escrow -->
+    <!-- Escrow Example -->
     <section class="card">
-      <h2>💰 Escrow</h2>
+      <h2>🔒 Escrow</h2>
       <div class="small">Call: <code>deposit() payable</code></div>
-      <input id="escrowEth" type="number" placeholder="ETH amount" step="0.00000001" />
-      <button onclick="actions.depositEscrow()">Deposit</button>
-      <div class="status" id="statusEscrow"></div>
-      <a class="link" href="https://basescan.org/address/0xAA168dCC429308B51F0511eca6fB448765a101AC#code" target="_blank">View on BaseScan</a>
+      <input id="Escrow_deposit_value" type="number" placeholder="ETH amount" step="0.00000001" />
+      <button onclick="actions.Escrow.deposit()">Deposit</button>
+      <div class="status" id="Escrow_deposit_status"></div>
     </section>
 
-    <!-- Example for SubscriptionService -->
+    <!-- SubscriptionService Example -->
     <section class="card">
-      <h2>📅 SubscriptionService</h2>
+      <h2>📅 Subscription Service</h2>
       <div class="small">Call: <code>subscribe() payable</code></div>
-      <input id="subEth" type="number" placeholder="ETH amount" step="0.00000001" />
-      <button onclick="actions.subscribe()">Subscribe</button>
-      <div class="status" id="statusSubscribe"></div>
-      <a class="link" href="https://basescan.org/address/0x0200C05230F678B9ddCA7Ece63ef9aA7F49Dd3F2#code" target="_blank">View on BaseScan</a>
+      <input id="SubscriptionService_subscribe_value" type="number" placeholder="ETH amount" step="0.00000001" />
+      <button onclick="actions.SubscriptionService.subscribe()">Subscribe</button>
+      <div class="status" id="SubscriptionService_subscribe_status"></div>
     </section>
 
-    <!-- Example for Crowdfunding -->
+    <!-- Crowdfunding Example -->
     <section class="card">
-      <h2>💸 Crowdfunding</h2>
-      <div class="small">Call: <code>fund() payable</code></div>
-      <input id="fundEth" type="number" placeholder="ETH amount" step="0.00000001" />
-      <button onclick="actions.fund()">Fund</button>
-      <div class="status" id="statusFund"></div>
-      <a class="link" href="https://basescan.org/address/0xED7107FD71b5f41CE7d02B708Fa13bA7f1B7ce2F#writeContract" target="_blank">View on BaseScan</a>
+      <h2>💰 Crowdfunding</h2>
+      <div class="small">Call: <code>contribute() payable</code></div>
+      <input id="Crowdfunding_contribute_value" type="number" placeholder="ETH amount" step="0.00000001" />
+      <button onclick="actions.Crowdfunding.contribute()">Contribute</button>
+      <div class="status" id="Crowdfunding_contribute_status"></div>
     </section>
 
-    <!-- Example for Lottery -->
+    <!-- Lottery Example -->
     <section class="card">
       <h2>🎲 Lottery</h2>
       <div class="small">Call: <code>buyTicket() payable</code></div>
-      <input id="lotteryEth" type="number" placeholder="ETH amount" step="0.00000001" />
-      <button onclick="actions.buyTicket()">Buy Ticket</button>
-      <div class="status" id="statusLottery"></div>
-      <a class="link" href="https://basescan.org/address/0x7804466d44EF4A65bb3526719dFbb006Ec12A19D#code" target="_blank">View on BaseScan</a>
+      <input id="Lottery_buyTicket_value" type="number" placeholder="ETH amount" step="0.00000001" />
+      <button onclick="actions.Lottery.buyTicket()">Buy Ticket</button>
+      <div class="status" id="Lottery_buyTicket_status"></div>
     </section>
 
-    <!-- Example for MessageBoard -->
+    <!-- MessageBoard Example -->
     <section class="card">
-      <h2>💬 MessageBoard</h2>
+      <h2>💬 Message Board</h2>
       <div class="small">Call: <code>postMessage(string)</code></div>
-      <input id="messageText" placeholder="Write a message..." />
-      <button onclick="actions.postMessage()">Post</button>
-      <div class="status" id="statusMessage"></div>
-      <a class="link" href="https://basescan.org/address/0xAAc91bf539754Dc4A740e3B38Af99E0FC1E8e11B#code" target="_blank">View on BaseScan</a>
+      <input id="MessageBoard_postMessage_text" placeholder="Your message..." />
+      <button onclick="actions.MessageBoard.postMessage()">Post Message</button>
+      <div class="status" id="MessageBoard_postMessage_status"></div>
     </section>
-
   </main>
 
   <footer class="foot">
