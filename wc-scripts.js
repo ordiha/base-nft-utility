@@ -29,6 +29,12 @@ document.getElementById("btnConnect").addEventListener("click", async () => {
     web3 = new Web3(provider);
     accounts = await web3.eth.getAccounts();
     showWallet(accounts[0]);
+
+    // Ensure Base chain (ID: 8453)
+    await provider.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: "0x2105" }],
+    });
   } catch (err) {
     console.error(err);
     alert("Failed to connect wallet!");
@@ -37,7 +43,7 @@ document.getElementById("btnConnect").addEventListener("click", async () => {
 
 function showWallet(addr) {
   document.getElementById("addr").innerText = addr;
-  document.getElementById("chain").innerText = "Connected";
+  document.getElementById("chain").innerText = "Connected to Base";
 }
 
 // Actions for all contracts
@@ -45,32 +51,39 @@ const actions = {};
 
 for (const [name, { abi, address }] of Object.entries(CONTRACTS)) {
   actions[name] = {};
+  const contract = new web3.eth.Contract(abi, address);
 
   abi.forEach(fn => {
-    if (fn.type === "function") {
+    if (fn.type === "function" && fn.stateMutability !== "view" && fn.stateMutability !== "pure") {
       const fnName = fn.name;
 
       actions[name][fnName] = async () => {
         try {
           const inputs = fn.inputs.map(input => {
             const el = document.getElementById(`${name}_${fnName}_${input.name}`);
-            return el ? el.value : undefined;
+            if (!el || !el.value) throw new Error(`Missing input for ${input.name}`);
+            return input.type === "uint256" ? parseInt(el.value) : el.value;
           });
 
-          const contract = new web3.eth.Contract(abi, address);
-          const method = contract.methods[fnName](...inputs);
+          const statusEl = document.getElementById(`${name}_${fnName}_status`);
+          statusEl.innerText = "Processing...";
 
-          if (fn.stateMutability === "view" || fn.stateMutability === "pure") {
-            const result = await method.call({ from: accounts[0] });
-            document.getElementById(`${name}_${fnName}_status`).innerText = `Result: ${JSON.stringify(result)}`;
-          } else {
-            const tx = await method.send({ from: accounts[0] });
-            document.getElementById(`${name}_${fnName}_status`).innerText = `Tx: ${tx.transactionHash}`;
+          const options = { from: accounts[0] };
+          if (fn.stateMutability === "payable") {
+            const valueEl = document.getElementById(`${name}_${fnName}_value`);
+            if (!valueEl || !valueEl.value) throw new Error("Missing ETH amount");
+            options.value = web3.utils.toWei(valueEl.value, "ether");
           }
+
+          const gas = await contract.methods[fnName](...inputs).estimateGas(options);
+          const tx = await contract.methods[fnName](...inputs).send({ ...options, gas });
+
+          statusEl.innerText = `Tx: ${tx.transactionHash}`;
+          document.getElementById("txLog").innerText += `Tx [${name}.${fnName}]: ${tx.transactionHash}\n`;
         } catch (err) {
           console.error(err);
           const statusEl = document.getElementById(`${name}_${fnName}_status`);
-          if (statusEl) statusEl.innerText = `Error: ${err.message}`;
+          statusEl.innerText = `Error: ${err.message}`;
         }
       };
     }
