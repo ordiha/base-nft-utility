@@ -39,7 +39,7 @@
     <section class="card">
       <h2>🗳 Voting System</h2>
       <div class="small">Call: <code>vote(uint256)</code></div>
-      <input id="VotingSystem_vote_choice" type="number" placeholder="Choice ID" />
+      <input id="VotingSystem_vote_proposalIndex" type="number" placeholder="Proposal ID" min="0" />
       <button onclick="actions.VotingSystem.vote()">Vote</button>
       <div class="status" id="VotingSystem_vote_status"></div>
     </section>
@@ -47,16 +47,17 @@
     <!-- Escrow Example -->
     <section class="card">
       <h2>🔒 Escrow</h2>
-      <div class="small">Call: <code>deposit() payable</code></div>
-      <input id="Escrow_deposit_value" type="number" placeholder="ETH amount" step="0.00000001" />
-      <button onclick="actions.Escrow.deposit()">Deposit</button>
-      <div class="status" id="Escrow_deposit_status"></div>
+      <div class="small">Call: <code>fund() payable</code></div>
+      <input id="Escrow_fund_value" type="number" placeholder="ETH amount" step="0.00000001" />
+      <button onclick="actions.Escrow.fund()">Deposit</button>
+      <div class="status" id="Escrow_fund_status"></div>
     </section>
 
     <!-- SubscriptionService Example -->
     <section class="card">
       <h2>📅 Subscription Service</h2>
-      <div class="small">Call: <code>subscribe() payable</code></div>
+      <div class="small">Call: <code>subscribe(uint256) payable</code></div>
+      <input id="SubscriptionService_subscribe_months" type="number" placeholder="Months" min="1" step="1" />
       <input id="SubscriptionService_subscribe_value" type="number" placeholder="ETH amount" step="0.00000001" />
       <button onclick="actions.SubscriptionService.subscribe()">Subscribe</button>
       <div class="status" id="SubscriptionService_subscribe_status"></div>
