@@ -1,64 +1,77 @@
-import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.esm.min.js";
-import WalletConnectProvider from "https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js";
-
+let web3;
+let accounts;
 let provider;
-let signer;
 
-// Connect wallet function
-async function connectWallet() {
+// Connect Wallet button
+document.getElementById("btnConnect").addEventListener("click", async () => {
   try {
     if (window.ethereum) {
-      // Try browser extension wallet first (MetaMask, Rabby, etc.)
-      provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      signer = provider.getSigner();
-      const address = await signer.getAddress();
-      alert("Connected with extension: " + address);
-    } else {
-      // Fallback to WalletConnect (QR on desktop, deep link on mobile)
-      const wcProvider = new WalletConnectProvider({
-        rpc: {
-          8453: "https://mainnet.base.org" // Base mainnet
-        },
-        chainId: 8453,
-      });
-
-      await wcProvider.enable();
-      provider = new ethers.providers.Web3Provider(wcProvider);
-      signer = provider.getSigner();
-      const address = await signer.getAddress();
-      alert("Connected with WalletConnect: " + address);
+      provider = window.ethereum;
+      await provider.request({ method: "eth_requestAccounts" });
+      web3 = new Web3(provider);
+      accounts = await web3.eth.getAccounts();
+      showWallet(accounts[0]);
+      return;
     }
-  } catch (err) {
-    console.error("Wallet connection failed:", err);
-    alert("Wallet connection failed: " + err.message);
-  }
-}
 
-// Interact with contract function
-async function interactWithContract(contractAddress, abi, action, params = []) {
-  if (!signer) {
-    alert("Please connect a wallet first!");
-    return;
-  }
-  try {
-    const contract = new ethers.Contract(contractAddress, abi, signer);
-    const tx = await contract[action](...params);
-    alert(`Transaction sent! Hash: ${tx.hash}`);
-    await tx.wait();
-    alert("✅ Transaction confirmed!");
-  } catch (err) {
-    console.error("Contract interaction failed:", err);
-    alert("Contract interaction failed: " + err.message);
-  }
-}
+    const WalletConnectProvider = window.WalletConnectProvider.default;
+    provider = new WalletConnectProvider({
+      infuraId: "5056a2b581e5962f9e3083d68053b5d8"
+    });
 
-// Attach connect button
-document.addEventListener("DOMContentLoaded", () => {
-  const connectBtn = document.getElementById("btnConnect");
-  if (connectBtn) connectBtn.addEventListener("click", connectWallet);
+    await provider.enable();
+    web3 = new Web3(provider);
+    accounts = await web3.eth.getAccounts();
+    showWallet(accounts[0]);
+
+  } catch (err) {
+    console.error(err);
+    alert("Failed to connect wallet!");
+  }
 });
 
-// Expose to global
-window.connectWallet = connectWallet;
-window.interactWithContract = interactWithContract;
+function showWallet(addr) {
+  document.getElementById("addr").innerText = addr;
+  document.getElementById("chain").innerText = "Connected";
+}
+
+// Actions object for all contracts
+const actions = {};
+
+// Dynamically create methods from abis.js
+for (const [name, { abi, address }] of Object.entries(abis)) {
+  actions[name] = {};
+
+  abi.forEach(fn => {
+    if (fn.type === "function") {
+      const fnName = fn.name;
+
+      actions[name][fnName] = async () => {
+        try {
+          const inputs = fn.inputs.map(input => {
+            const el = document.getElementById(`${name}_${fnName}_${input.name}`);
+            if (!el) return undefined;
+            if (input.type.includes("uint") || input.type === "address") return el.value;
+            return el.value;
+          });
+
+          const contract = new web3.eth.Contract(abi, address);
+          const txMethod = contract.methods[fnName](...inputs);
+
+          let tx;
+          if (fn.stateMutability === "view" || fn.stateMutability === "pure") {
+            tx = await txMethod.call({ from: accounts[0] });
+            document.getElementById(`${name}_${fnName}_status`).innerText = `Result: ${tx}`;
+          } else {
+            tx = await txMethod.send({ from: accounts[0] });
+            document.getElementById(`${name}_${fnName}_status`).innerText = `Tx: ${tx.transactionHash}`;
+          }
+        } catch (e) {
+          console.error(e);
+          const statusEl = document.getElementById(`${name}_${fnName}_status`);
+          if (statusEl) statusEl.innerText = `Error: ${e.message}`;
+        }
+      };
+    }
+  });
+}
