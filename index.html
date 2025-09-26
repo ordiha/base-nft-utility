@@ -1,26 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Base NFT Utility</title>
-  <script src="https://unpkg.com/web3@1.10.0/dist/web3.min.js"></script>
-  <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
-  <script src="wc-scripts.js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
-    h1 { text-align: center; }
-    #wallet-status { margin: 10px 0; text-align: center; }
-    #contract-list { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; }
-    .contract-card { background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 16px; width: 280px; }
-    .contract-card h3 { margin-top: 0; }
-    .btn { margin-top: 10px; padding: 8px 12px; border: none; border-radius: 6px; background: #007bff; color: #fff; cursor: pointer; }
-    .btn:hover { background: #0056b3; }
-  </style>
+  <meta charset="UTF-8">
+  <title>Base NFT Utility + WalletConnect</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <script src="https://unpkg.com/@walletconnect/web3-provider/dist/umd/index.min.js"></script>
 </head>
 <body>
-  <h1>Base NFT Utility</h1>
-  <div id="wallet-status">Not connected</div>
-  <button id="btnConnect" class="btn">Connect Wallet</button>
-  <div id="contract-list"></div>
+  <h1>Base NFT Utility dApp</h1>
+
+  <button id="btnConnect">🔗 Connect Wallet</button>
+  <p id="walletAddress">Not connected</p>
+
+  <h2>Contracts</h2>
+  <div id="contracts">
+    <button onclick="interactContract('GiveawayNFT')">🎁 GiveawayNFT</button>
+    <button onclick="interactContract('DonationTracker')">💰 DonationTracker</button>
+    <button onclick="interactContract('VotingSystem')">🗳️ VotingSystem</button>
+    <button onclick="interactContract('Escrow')">🤝 Escrow</button>
+    <button onclick="interactContract('SubscriptionService')">📅 SubscriptionService</button>
+    <button onclick="interactContract('Crowdfunding')">🌍 Crowdfunding</button>
+    <button onclick="interactContract('Lottery')">🎟️ Lottery</button>
+    <button onclick="interactContract('MessageBoard')">💬 MessageBoard</button>
+  </div>
+
+  <div id="interaction"></div>
+
+  <script src="abis.js"></script>
+  <script src="wc-scripts.js"></script>
 </body>
 </html>
