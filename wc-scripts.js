@@ -59,14 +59,18 @@ for (const [name, { abi, address }] of Object.entries(CONTRACTS)) {
 
       actions[name][fnName] = async () => {
         try {
+          if (!accounts || !accounts[0]) {
+            throw new Error("Wallet not connected");
+          }
+
           const inputs = fn.inputs.map(input => {
-            const el = document.getElementById(`${name}_${fnName}_${input.name}`);
-            if (!el || !el.value) throw new Error(`Missing input for ${input.name}`);
+            const el = document.getElementById(`${name}_${fnName}_${input.name || "value"}`);
+            if (!el || !el.value) throw new Error(`Missing input for ${input.name || "value"}`);
             return input.type === "uint256" ? parseInt(el.value) : el.value;
           });
 
           const statusEl = document.getElementById(`${name}_${fnName}_status`);
-          statusEl.innerText = "Processing...";
+          statusEl.innerText = "Waiting for wallet confirmation...";
 
           const options = { from: accounts[0] };
           if (fn.stateMutability === "payable") {
@@ -75,8 +79,13 @@ for (const [name, { abi, address }] of Object.entries(CONTRACTS)) {
             options.value = web3.utils.toWei(valueEl.value, "ether");
           }
 
+          // Estimate gas and send transaction
           const gas = await contract.methods[fnName](...inputs).estimateGas(options);
-          const tx = await contract.methods[fnName](...inputs).send({ ...options, gas });
+          const tx = await contract.methods[fnName](...inputs).send({
+            ...options,
+            gas,
+            gasPrice: await web3.eth.getGasPrice(),
+          });
 
           statusEl.innerText = `Tx: ${tx.transactionHash}`;
           document.getElementById("txLog").innerText += `Tx [${name}.${fnName}]: ${tx.transactionHash}\n`;
